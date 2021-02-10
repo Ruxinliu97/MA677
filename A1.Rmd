@@ -4,6 +4,11 @@ author: "Ruxin Liu"
 output: pdf_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width=6, fig.height=4) 
+```
+
+
 ## Assignment Objective:
 Reproduce example 3.11 on page 102 of Introduction of Probability. 
 
@@ -25,21 +30,80 @@ Now, we are going to reproduce the program PowerCurve that being mentioned in th
 book to find the critical value m. The sample size n is set to be 100 and p has 
 a range from 0.4 to 1. Firstly, we can create a function to plot the power curve.
 
-```{r}
+```{r, message = FALSE}
 library(tidyverse)
-power_curve <- function(m, n){
+power_curve <- function(m){
   p <- seq(from = 0.4, to = 1, by = 0.01)
-  a <- dbinom(m, size = n, prob = p)
+  # Binomial distribution
+  a <- dbinom(m, size = 100, prob = p)
   power <- cumsum(a)
   return(power)
 }
 ```
 
+
+```{r}
+box <- function(m){
+  x_axis <- seq(from = 0.4, to = 1, by = 0.01)
+plot <- ggplot() +
+  # Plot the power curve
+  geom_line(aes(x_axis, power_curve(m))) +
+  # Adding the box from 0.6 to 0.8, with bottom and top at heights 0.05 and 0.95
+  geom_rect(aes(xmin = 0.6, xmax = 0.8, ymin = 0.05, ymax = 0.95, col = "red"), 
+            fill = NA) +
+  xlab("Probability (p)") +
+  ylab("Power (1 - beta)") +
+  ggtitle(paste("The power curve ( m =", m, ")")) +
+  theme(legend.position = "none") +
+  theme(plot.title = element_text(hjust = 0.5))
+return(plot)
+}
+```
+
+```{r}
+box(50)
+```
+
+As mentioned in the book, when the critical value m increases, type 1 error is 
+less likely to happen; while when the critical value m decreases, type 2 error 
+is less likely to happen, we would like both error probabilities less than 5%.
+From the plot, the boundary of type 1 error probability is the upper line of the
+box (power = 0.95) and the boundary of type 2 error probability is the bottom 
+line (power = 0.05) of the box. Therefore, we are looking for the value for m 
+that produces the power curve entering the box from the bottom and leaving from 
+the top. Now, we will try different values of m.  
+
+```{r}
+box(60)
+```
+```{r}
+box(65)
+```
+```{r}
+box(75)
+```
+```{r}
+box(85)
+```
+
+```{r}
+box(68)
+```
+```{r}
+box(74)
+```
+
+As doing experiments with different m values, we can confirm with the book that 
+m = 69 is the smallest value for m that obstructs a type 1 error, while m = 73 
+is the largest which obstructs a type 2. The plot below is showing how the power
+curve looks like when the critical value is between 69 and 73, which is the same 
+as Figure 3.7 from the book shows. 
+
 ```{r}
 x_axis <- seq(from = 0.4, to = 1, by = 0.01)
 ggplot() +
-  geom_line(aes(x_axis, power_curve(60, 100))) +
-  # Adding the box from 0.6 to 0.8, with bottom and top at heights 0.05 and 0.95
+  geom_line(aes(x_axis, power_curve(69))) +
+  geom_line(aes(x_axis, power_curve(73))) +
   geom_rect(aes(xmin = 0.6, xmax = 0.8, ymin = 0.05, ymax = 0.95, col = "red"), 
             fill = NA) +
   xlab("Probability (p)") +
@@ -48,4 +112,9 @@ ggplot() +
   theme(legend.position = "none") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+
+
+
+
 
