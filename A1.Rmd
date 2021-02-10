@@ -1,0 +1,8 @@
+---
+title: "MA677 A1"
+author: "Ruxin Liu"
+output: pdf_document
+---
+
+## Assignment Objective:
+Reproduce example 3.11 on page 102 of Introduction of Probability. 
